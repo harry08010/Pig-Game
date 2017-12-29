@@ -7,9 +7,14 @@ GAME RULES:
 - The player can choose to 'Hold', which means that his ROUND score gets added to his GLBAL score. After that, it's the next player's turn
 - The first player to reach 100 points on GLOBAL score wins the game
 
+More Challenges:
+1. A player loses his ENTIRE score when he rolls two 6 in a row. After that, it's the next player's turn.
+2. Add an input field to the HTML where players can set the winning score, so that they can change the predefiend score of 100.
+3. Add another dice to the game, so that there are two dices now. The player loses his current score when one of them is 1.
+
 */
 
-var scores, roundScore, activePlayer, gamePlaying;
+var scores, roundScore, activePlayer, gamePlaying, lastDiceNumber;
 init();
 
 document.querySelector('.btn-roll').addEventListener('click', function() {
@@ -22,9 +27,22 @@ document.querySelector('.btn-roll').addEventListener('click', function() {
         diceDOM.src = 'dice-' + dice + '.png';
         // 3. Update the round score IF the rolled number was NOT 1
         if (dice !== 1) {
-            // Add score
-            roundScore += dice;
-            document.querySelector('#current-' + activePlayer).textContent = roundScore;
+            // Compare with the last dice number
+            if (lastDiceNumber !== 6) {
+                lastDiceNumber = dice;
+                // Add score
+                roundScore += dice;
+                document.querySelector('#current-' + activePlayer).textContent = roundScore;
+            } else {
+                // two 6 in a row
+                if (dice === 6) {
+                    scores[activePlayer] = 0;
+                    roundScore = 0;
+                    document.querySelector('#score-' + activePlayer).textContent = scores[activePlayer];
+                    document.querySelector('#current-' + activePlayer).textContent = roundScore;
+                    nextPlayer();
+                }
+            }
         } else {
             // Next player
             nextPlayer();
@@ -58,6 +76,7 @@ document.querySelector('.btn-hold').addEventListener('click', function() {
 function nextPlayer() {
     activePlayer === 0 ? activePlayer = 1 : activePlayer = 0; // ternary operator
     roundScore = 0;
+    lastDiceNumber = 0;
     document.getElementById('current-0').textContent = '0';
     document.getElementById('current-1').textContent = '0';
     document.querySelector('.player-0-panel').classList.toggle('active');
@@ -74,6 +93,7 @@ function init() {
     scores = [0, 0];
     roundScore = 0;
     activePlayer = 0;
+    lastDiceNumber = 0;
     gamePlaying = true;
     //document.querySelector('#current-' + activePlayer).textContent = dice;
     //document.querySelector('#current-' + activePlayer).innerHTML = '<em>' + dice + '<em>';
